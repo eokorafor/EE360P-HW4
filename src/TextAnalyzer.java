@@ -42,6 +42,10 @@ public class TextAnalyzer extends Configured implements Tool {
                     wordArray[1].set(tokens[j]);
                     TupleWritable wordTuple = new TupleWritable(wordArray);
                     context.write(wordTuple, one);
+//                    wordArray[0].set(tokens[j]);
+//                    wordArray[1].set(tokens[i]);
+//                    wordTuple = new TupleWritable(wordArray);
+//                    context.write(wordTuple, one);
                 }
             }
         }
