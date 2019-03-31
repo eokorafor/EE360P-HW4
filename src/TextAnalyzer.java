@@ -24,7 +24,7 @@ public class TextAnalyzer extends Configured implements Tool {
     //     <Input Key Type, Input Value Type, Output Key Type, Output Value Type>
     public static class TextMapper extends Mapper<LongWritable, Text, TupleWritable, IntWritable> {
         private final static IntWritable one = new IntWritable(1);
-        private Text[] wordArray = new Text[2];
+        private final static Text[] wordArray = new Text[2];
 
         public void map(LongWritable key, Text value, Context context)
                 throws IOException, InterruptedException {
@@ -50,7 +50,7 @@ public class TextAnalyzer extends Configured implements Tool {
     // Replace "?" with your own key / value types
     // NOTE: combiner's output key / value types have to be the same as those of mapper
     public static class TextCombiner extends Reducer<TupleWritable, IntWritable, TupleWritable, IntWritable> {
-        private IntWritable result = new IntWritable();
+        private final static IntWritable result = new IntWritable();
         public void reduce(TupleWritable key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             // Implementation of you combiner function
@@ -138,7 +138,7 @@ public class TextAnalyzer extends Configured implements Tool {
         System.exit(res);
     }
 
-    // You may define sub-classes here. Example:
+    // You may define sub-classes here.
     public static class WordPair implements Writable{
         String s1;
         String s2;
@@ -170,7 +170,9 @@ public class TextAnalyzer extends Configured implements Tool {
 
         @Override
         public void readFields(DataInput dataInput) throws IOException {
-            dataInput.readLine();
+            String[] tokens = dataInput.readLine().split(" ");
+            s1 = tokens[0];
+            s2 = tokens[1];
         }
     }
 }
