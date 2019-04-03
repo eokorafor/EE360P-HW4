@@ -4,8 +4,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.join.TupleWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -16,8 +14,6 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -36,12 +32,10 @@ public class TextAnalyzer extends Configured implements Tool {
 
             // Implementation of you mapper function
             String line = value.toString();
-            //line = line.replaceAll("[^a-zA-Z\\d\\s:]", " ");
             line = line.replaceAll("[^a-zA-Z0-9]", " ");
             line = line.trim();
             String[] tokens = line.split(" ");
             Arrays.sort(tokens);
-            System.out.println(Arrays.asList(tokens));
             for (int i = 0; i < tokens.length; i++) {
                 for (int j = i+1; j < tokens.length; j++) {
                     if (tokens[0].equals("") || tokens[1].equals(""))
