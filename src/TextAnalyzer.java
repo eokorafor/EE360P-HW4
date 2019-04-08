@@ -16,6 +16,9 @@ import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 // Do not change the signature of this class
 public class TextAnalyzer extends Configured implements Tool {
@@ -31,22 +34,49 @@ public class TextAnalyzer extends Configured implements Tool {
                 throws IOException, InterruptedException {
 
             // Implementation of you mapper function
+
+            StringTokenizer itr = new StringTokenizer(value.toString());
+
             String line = value.toString();
-            line = line.replaceAll("[^a-zA-Z0-9]", " ");
             line = line.toLowerCase();
+            line = line.replaceAll("[^a-zA-Z0-9]", " ");
             line = line.trim();
             String[] tokens = line.split(" ");
-            Arrays.sort(tokens);
-            for (int i = 0; i < tokens.length; i++) {
-                for (int j = i+1; j < tokens.length; j++) {
-                    if (!tokens[i].equals("") && !tokens[j].equals("")) {
-                        wordPair.set(tokens[i] + " " + tokens[j]);
-                        context.write(wordPair, one);
-                        wordPair.set(tokens[j] + " " + tokens[i]);
-                        context.write(wordPair, one);
-                    }
-                }
+
+            Set<String> allWords = new HashSet<String>();
+
+            for(int i = 0; i < tokens.length; i++){
+            	allWords.add(tokens[i]);
             }
+
+
+            for(String word : allWords){
+            	for(String secWord : allWords){
+            		if(secWord.equals(word)) continue;
+	                    if (word.equals("") || secWord.equals("")) continue;
+                    	wordPair.set(word + " " + secWord);
+                    	context.write(wordPair, one);
+            	}
+            }
+
+//            Arrays.sort(tokens);
+            // for (int i = 0; i < tokens.length; i++) {
+            // 	// for(int j = 0; i < tokens.length; i++){
+            // 	// 	if() continue;
+            // 	// }
+            //     for (int j = 0; j < tokens.length; j++) {
+            //         if (tokens[i].equals("") || tokens[j].equals(""))
+            //             continue;
+
+            //    		if(i == j || tokens[i].equals(tokens[j])) continue;
+
+            //         wordPair.set(tokens[i] + " " + tokens[j]);
+            //         context.write(wordPair, one);
+            //         //automatically make both.. why not wait
+            //         wordPair.set(tokens[j] + " " + tokens[i]);
+            //         context.write(wordPair, one);
+            //     }
+            // }
         }
     }
 
@@ -54,6 +84,7 @@ public class TextAnalyzer extends Configured implements Tool {
     // NOTE: combiner's output key / value types have to be the same as those of mapper
     public static class TextCombiner extends Reducer<Text,IntWritable,Text,IntWritable> {
         private final static IntWritable result = new IntWritable();
+
         public void reduce(Text key, Iterable<IntWritable> values, Context context)
                 throws IOException, InterruptedException {
             // Implementation of you combiner function
@@ -71,14 +102,14 @@ public class TextAnalyzer extends Configured implements Tool {
     public static class TextReducer extends Reducer<Text, IntWritable, Text, Text> {
         private final static Text emptyText = new Text("");
 
-        public void reduce(Text key, Iterable<IntWritable> values, Context context)
+        public void reduce(Text key, IntWritable values, Context context)
                 throws IOException, InterruptedException {
             // Implementation of you reducer function
             Text value = new Text();
-            int sum = 0;
-            for (IntWritable val : values) {
-                sum += val.get();
-            }
+            int sum = values.get();
+            // for (IntWritable val : values) {
+            //     sum += val.get();
+            // }
 
             // Write out the results; you may change the following example
             // code to fit with your reducer function.
