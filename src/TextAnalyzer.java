@@ -39,12 +39,12 @@ public class TextAnalyzer extends Configured implements Tool {
             Arrays.sort(tokens);
             for (int i = 0; i < tokens.length; i++) {
                 for (int j = i+1; j < tokens.length; j++) {
-                    if (tokens[0].equals("") || tokens[1].equals(""))
-                        continue;
-                    wordPair.set(tokens[0] + " " + tokens[1]);
-                    context.write(wordPair, one);
-                    wordPair.set(tokens[1] + " " + tokens[0]);
-                    context.write(wordPair, one);
+                    if (!tokens[i].equals("") && !tokens[j].equals("")) {
+                        wordPair.set(tokens[i] + " " + tokens[j]);
+                        context.write(wordPair, one);
+                        wordPair.set(tokens[j] + " " + tokens[i]);
+                        context.write(wordPair, one);
+                    }
                 }
             }
         }
