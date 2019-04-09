@@ -15,7 +15,10 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 // Do not change the signature of this class
 public class TextAnalyzer extends Configured implements Tool {
@@ -36,13 +39,15 @@ public class TextAnalyzer extends Configured implements Tool {
             line = line.toLowerCase();
             line = line.trim();
             String[] tokens = line.split(" ");
-            Arrays.sort(tokens);
+            tokens = Arrays.stream(tokens)
+                    .distinct()
+                    .filter(s -> s.equals(""))
+                    .toArray(String[]::new);
+
             for (int i = 0; i < tokens.length; i++) {
-                for (int j = i+1; j < tokens.length; j++) {
-                    if (!tokens[i].equals("") && !tokens[j].equals("")) {
+                for (int j = 0; j < tokens.length; j++) {
+                    if (i != j) {
                         wordPair.set(tokens[i] + " " + tokens[j]);
-                        context.write(wordPair, one);
-                        wordPair.set(tokens[j] + " " + tokens[i]);
                         context.write(wordPair, one);
                     }
                 }
